@@ -1,0 +1,151 @@
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.Line2D;
+import java.awt.Color;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.util.LinkedList;
+
+public class Player extends GameObject {
+
+	public class FireLocation {
+		private double x, y;
+
+		public FireLocation(double x, double y) {
+			this.x = x;
+			this.y = y;
+		}
+
+		public double getX(){
+			return this.x;
+		}
+
+		public double getY(){
+			return this.y;
+		}
+	}
+
+	private double speed = 128;
+	private int width = 16;
+
+	private LinkedList<FireLocation> fireLocations = new LinkedList<FireLocation>();
+
+	public Player(int x, int y, ID id) {
+		super(x, y, id);
+	}
+
+	public void tick(double dt) {
+		if (dirKeys[0]) {
+			velY = -speed;
+		}
+		if (dirKeys[1]) {
+			velX = speed;
+		}
+		if (dirKeys[2]) {
+			velY = speed;
+		}
+		if (dirKeys[3]) {
+			velX = -speed;
+		}
+
+		velX *= 0.9;
+		velY *= 0.9;
+
+		x += velX * dt;
+		y += velY * dt;
+
+		x = Game.clamp(x, 0, Game.WIDTH);
+		y = Game.clamp(y, 0, Game.HEIGHT);
+	}
+
+	public void render(Graphics g) {
+		Graphics2D g2d = (Graphics2D) g;
+		if (id == ID.Player) {
+			g.setColor(Color.blue);
+		} else if (id == ID.Player2) {
+			g.setColor(Color.red);
+		}
+		
+		g.fillRect((int)x-(width/2), (int)y-(width/2), width, width);
+
+		g.setColor(Color.white);
+		for (int i = 0; i < fireLocations.size(); i++) {
+			FireLocation tempFireLocation = fireLocations.get(i);
+
+			// g.drawLine((int)this.x, (int)this.y, (int)tempFireLocation.getX(), (int)tempFireLocation.getY());
+			g2d.draw(new Line2D.Double((double)this.x, (double)this.y, tempFireLocation.getX(), tempFireLocation.getY()));
+		}
+
+		fireLocations.clear();
+	}
+
+	public void Fire (int posX, int posY) {
+		double[] dirs = Game.lookAt(this.x, this.y, posX, posY);
+		double dirX = dirs[0];
+		double dirY = dirs[1];
+		double length = 1000;
+		// fireLocations.add(new FireLocation((dirX*length), (dirY*length)));
+		fireLocations.add(new FireLocation(posX, posY));
+	}
+
+	public void keyPressed(KeyEvent e) {
+		int key = e.getKeyCode();
+
+		switch (key) {
+			case KeyEvent.VK_W:
+				setKey(0, true);
+				break;
+			case KeyEvent.VK_D:
+				setKey(1, true);
+				break;
+			case KeyEvent.VK_S:
+				setKey(2, true);
+				break;
+			case KeyEvent.VK_A:
+				setKey(3, true);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void keyReleased(KeyEvent e) {
+		int key = e.getKeyCode();
+		
+		switch (key) {
+			case KeyEvent.VK_W:
+				setKey(0, false);
+				break;
+			case KeyEvent.VK_D:
+				setKey(1, false);
+				break;
+			case KeyEvent.VK_S:
+				setKey(2, false);
+				break;
+			case KeyEvent.VK_A:
+				setKey(3, false);
+                break;
+            default:
+                break;
+        }
+	}
+	
+	public void mousePressed(MouseEvent e) {
+		int mouseButton = e.getButton();
+
+		switch (mouseButton) {
+			case MouseEvent.BUTTON1:
+				Fire(e.getX(), e.getY());
+				break;
+			case MouseEvent.BUTTON2:
+				break;
+			case MouseEvent.BUTTON3:
+				break;
+            default:
+                break;
+        }
+    }
+
+    public void mouseReleased(MouseEvent e) {
+    }
+}
