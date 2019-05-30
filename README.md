@@ -1,4 +1,9 @@
 # Survive
+
+![menu](https://i.imgur.com/VUDVt4r.png)
+
+![video](https://i.imgur.com/fWuBtRN.gif)
+
 A small java based game built entirely with Java2D. Made with DrJava and Visual Studio Code.
 
 The aim is to reach level 30.
